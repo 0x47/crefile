@@ -721,6 +721,11 @@ public:
         return S_ISDIR(stat_->st_mode);
     }
 
+    bool is_file() const {
+        struct stat* st = get_stat();
+        return S_ISREG(stat_->st_mode);
+    }
+
     bool is_end() const {
         return entry_ == nullptr;
     }
@@ -777,6 +782,10 @@ public:
 
     bool is_directory() const {
         return dir_entry_.is_directory();
+    }
+
+    bool is_file() const {
+        return dir_entry_.is_file();
     }
 
     const PosixPath& dir_path() const {
@@ -960,6 +969,26 @@ public:
         struct stat st;
         const auto res = ::stat(path.path_to_host(), &st);
         return res == 0;
+    }
+
+    bool is_directory() const {
+        return Self::is_directory(*this);
+    }
+
+    static bool is_directory(const PathImplUnix& path) {
+        struct stat st;
+        const auto res = ::stat(path.path_to_host(), &st);
+        return res == 0 && S_ISDIR(st.st_mode);
+    }
+
+    bool is_file() const {
+         return Self::is_file(*this);
+    }
+
+    static bool is_file(const PathImplUnix& path) {
+        struct stat st;
+        const auto res = ::stat(path.path_to_host(), &st);
+        return res == 0 && S_ISREG(st.st_mode);
     }
 
     operator String&&() {
